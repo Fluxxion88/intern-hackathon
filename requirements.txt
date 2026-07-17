@@ -1,0 +1,11 @@
+pandas==2.2.3
+fastapi
+uvicorn
+pydantic>=2
+pytest
+python-multipart
+openai
+boto3
+anthropic
+python-dotenv
+httpx
