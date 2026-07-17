@@ -74,8 +74,8 @@ def get_trainer() -> Trainer:
     #     (status/outcome/best_score/attempts_used/train_ms)
     #   - MUST emit a terminal event ({"type":"converged",...} or {"type":"failed",...})
     # ────────────────────────────────────────────────────────────────────
-    from api import engine_stub
-    return engine_stub.train
+    from api import engine_bridge
+    return engine_bridge.train
 
 
 def is_training(job_id: str) -> bool:

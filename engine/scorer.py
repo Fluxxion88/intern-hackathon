@@ -493,6 +493,9 @@ def score(produced: pd.DataFrame, expected: pd.DataFrame,
     # 3. CELLS — typed comparison on matched rows
     ok = [[False] * n_cols_e for _ in range(n_rows_e)]
     mismatches: dict[str, list[tuple[str, str, str]]] = {c: [] for c in exp_cols}
+    mismatch_idx: dict[str, list[int]] = {c: [] for c in exp_cols}
+    totals_idx = {i for (i, _) in matched
+                  if _looks_like_totals_row(exp.iloc[i], exp, exp_cols)}
     for (i, j) in matched:
         row_key = str(exp.iloc[i][key_col]) if key_col else f"row {i + 1}"
         for ci, e_col in enumerate(exp_cols):
@@ -506,9 +509,23 @@ def score(produced: pd.DataFrame, expected: pd.DataFrame,
                 ok[i][ci] = i not in misplaced_exp_rows
             else:
                 mismatches[e_col].append((row_key, p_val.strip(), e_val.strip()))
+                mismatch_idx[e_col].append(i)
 
     for e_col in exp_cols:
-        if mismatches[e_col]:
+        if not mismatches[e_col]:
+            continue
+        # a column wrong ONLY on the totals row is a totals bug, not a column
+        # bug — say so precisely, or the repairer rewrites the whole pipeline
+        if totals_idx and all(i in totals_idx for i in mismatch_idx[e_col]):
+            findings.append(Finding(
+                "TOTALS_ROW", e_col, mismatches[e_col][:3],
+                f"only the TOTAL row's '{e_col}' is wrong; every data row above it "
+                f"already matches. The target's total is the sum of '{e_col}' over "
+                f"the data rows, skipping non-numeric entries (like 'TBC'), written "
+                f"in the same number format as the rest of the column. Change only "
+                f"the totals computation — do not touch the per-row logic.",
+                float(len(mismatches[e_col]))))
+        else:
             findings.extend(_classify_column(e_col, mismatches[e_col]))
 
     # 4. unmatched expected rows → TOTALS_ROW or MISSING_ROW

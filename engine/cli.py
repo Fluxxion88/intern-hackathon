@@ -20,7 +20,6 @@ load_dotenv(REPO_ROOT / ".env")
 
 # The frozen job_spec — docs/05 §4.3, verbatim. Approved read-back for the brief.
 FIXTURE_SPEC = {
-    "slug": "andrei-dispatch",
     "rules": [
         {"n": 1, "text": "Take two files from you: the day's manifest and the current rate card.",
          "confidence": 1.0, "source": "said"},
@@ -32,14 +31,17 @@ FIXTURE_SPEC = {
          "confidence": 0.9, "source": "said"},
         {"n": 5, "text": "Turn kilos into tonnes, two decimal places.", "confidence": 0.85, "source": "said"},
         {"n": 6, "text": "Sort by destination A→Z, then dearest run first.", "confidence": 0.8, "source": "said"},
-        {"n": 7, "text": "Name the columns your way: Date, Route, Truck, Load (t), Cost ($).", "confidence": 0.7, "source": "inferred"},
+        {"n": 7, "text": "Name the columns your way: Date, Route, Truck, Load (t), Cost ($).", "confidence": 0.7, "source": "guessed"},
         {"n": 8, "text": "Put a TOTAL row at the bottom with the load and the cost added up, and nothing in the other columns.", "confidence": 0.9, "source": "said"}
     ],
     "guesses": [
         "Dates like 17.07.2026, because that's how your files are written.",
         "A comma in the thousands, no cents."
     ],
-    "output_columns": ["Date", "Route", "Truck", "Load (t)", "Cost ($)"]
+    "output_columns": ["Date", "Route", "Truck", "Load (t)", "Cost ($)"],
+    # keep key order identical to api JobSpec.model_dump(): rules, guesses,
+    # output_columns, slug — the cassette key hashes the serialized spec
+    "slug": "andrei-dispatch"
 }
 
 
