@@ -18,9 +18,11 @@ plan → act → observe → self-correct, against a reward signal the model can
   iterate    repairer patches the highest-weight finding → repeat → plateau
 ```
 
-Attempt 1: 41%. Attempt 5: 100%. Five tries, 41 seconds.
-41% is a good model, a clear brief, and less than half the job right —
-that's why this needs a loop and not a chat.
+Our recorded run: attempt 1 **68%**, attempt 2 **96%**, attempt 3 **100%** — 53 seconds.
+A good model, a clear brief, and a third of the job still wrong on the first try —
+that's why this needs a loop and not a chat. The Ledger shows the true sequence,
+including the runs where attempt 1 crashed outright; the loop recovers, keeps the
+best artifact, and never claims a score it didn't measure.
 
 ## The claim
 
