@@ -1,0 +1,7 @@
+carrier_code,carrier_name,truck_id,base_fee_usd,rate_per_km_usd,currency,valid_from
+VLY,Valley Haul Co,TRK-03,240.00,1.85,USD,2026-07-01
+PCF,Pacific Freightways,TRK-11,310.00,2.10,USD,2026-07-01
+GRN,Grand Line Trucking,TRK-07,180.00,1.40,USD,2026-07-01
+SRA,Sierra Cartage,TRK-22,265.00,1.95,USD,2026-07-01
+DLT,Delta Road LLC,TRK-15,205.00,1.62,USD,2026-07-01
+BAY,Bayline Transport,TRK-09,290.00,2.35,USD,2026-07-01

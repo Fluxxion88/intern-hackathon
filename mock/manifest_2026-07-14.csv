@@ -1,0 +1,14 @@
+shipment_id,date,origin,destination,cargo_type,weight_kg,distance_km,carrier_code
+SHP-1041,2026-07-14,Oakland,Fresno,palletised,1240,300,PCF
+SHP-1042,2026-07-14,Oakland,Bakersfield,palletised,480,460,VLY
+SHP-1043,2026-07-14,Stockton,Fresno,bulk,2900,210,VLY
+SHP-1044,2026-07-14,Oakland,Sacramento,refrigerated,860,130,GRN
+SHP-1045,2026-07-14,Fremont,Bakersfield,palletised,3150,440,SRA
+SHP-1046,2026-07-14,Stockton,Sacramento,palletised,320,75,DLT
+SHP-1047,2026-07-14,Oakland,Fresno,bulk,4020,305,BAY
+SHP-1048,2026-07-14,Fremont,Modesto,palletised,940,145,GRN
+SHP-1049,2026-07-14,Oakland,Bakersfield,refrigerated,1780,455,DLT
+SHP-1050,2026-07-14,Stockton,Modesto,palletised,150,60,VLY
+SHP-1051,2026-07-14,Fremont,Sacramento,bulk,2260,140,MTN
+SHP-1052,2026-07-14,Oakland,Modesto,palletised,410,150,SRA
+SHP-1053,2026-07-14,Stockton,Fresno,palletised,1595,215,SRA

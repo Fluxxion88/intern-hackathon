@@ -1,0 +1,11 @@
+Date,Route,Truck,Load (t),Cost ($)
+14.07.2026,Bakersfield,TRK-22,3.15,"1,123"
+14.07.2026,Bakersfield,TRK-15,1.78,942
+14.07.2026,Fresno,TRK-09,4.02,"1,007"
+14.07.2026,Fresno,TRK-11,1.24,940
+14.07.2026,Fresno,TRK-22,1.59,684
+14.07.2026,Fresno,TRK-03,2.90,628
+14.07.2026,Modesto,TRK-07,0.94,383
+14.07.2026,Sacramento,TRK-07,0.86,362
+14.07.2026,Sacramento,TBC,2.26,TBC
+,,TOTAL,18.74,"6,069"
