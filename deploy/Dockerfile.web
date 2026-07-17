@@ -19,6 +19,9 @@ WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
 COPY web/ ./
+RUN mkdir -p public
+ARG API_ORIGIN=http://api:8000
+ENV API_ORIGIN=$API_ORIGIN
 RUN npm run build
 
 # ---- run ----
