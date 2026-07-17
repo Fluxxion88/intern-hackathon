@@ -1,0 +1,6 @@
+{
+  "need": "send the finished summary back by email",
+  "service": "StableEmail Send (discovered via Zero, capability z_dnUhpk.1, $0.02/call, rating 5.0)",
+  "call": "zero search 'send an email with an attachment' → POST https://stableemail.dev/api/send",
+  "result_path": "recorded 2026-07-17 21:14 PDT from a live `zero search` — searchId srch_jK9Mhpt11fl3hwK2lWS1o, 23 capabilities found"
+}

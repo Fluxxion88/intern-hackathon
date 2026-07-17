@@ -42,6 +42,20 @@ async def train(job_id: str, publish: Callable[[dict], None]) -> None:
             # the diff endpoint reads the produced CSV from code_path
             store.add_attempt(job_id, ev["attempt"], findings=[],
                               code_path=str(job_dir / "attempts" / f"attempt_{n}_out.csv"))
+        if ev.get("type") == "converged" and ev.get("outcome") == "PERFECT":
+            # the intern's hands: discover the email-transport capability via
+            # Zero (mock replays the recorded live discovery — no network in
+            # the demo). Transport, not transform: outside the guard's scope.
+            try:
+                from engine.adapters.zero import ZeroAdapter
+                cap = ZeroAdapter().resolve("send the finished summary back by email")
+                if cap:
+                    loop.call_soon_threadsafe(
+                        publish,
+                        {"type": "log",
+                         "line": f"got a new skill · via Zero — {cap.service}"})
+            except Exception:
+                pass  # a sponsor adapter must never break the happy path
         loop.call_soon_threadsafe(publish, ev)
 
     try:

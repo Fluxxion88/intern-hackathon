@@ -38,13 +38,32 @@ class ZeroAdapter:
         self.mode = mode or os.environ.get("ZERO_MODE", "mock")
 
     def resolve(self, need: str) -> Capability | None:
-        """Discover a service for a capability gap. Mock replays a recording."""
+        """Discover a service for a capability gap.
+
+        live: real `zero search` (CLI, authed via `zero auth login`) — takes the
+        top healthy capability. mock: replays the recording of the live call
+        made 2026-07-17 (recordings/zero_email_send.json), zero network.
+        """
         if self.mode == "mock":
-            rec = MOCK_DIR / "zero_pdf_extract.json"
+            rec = MOCK_DIR / "zero_email_send.json"
             if rec.exists():
                 d = json.loads(rec.read_text())
                 return Capability(**d)
             return None
-        # TODO(sponsor): live path — Zero programmatic discovery from engine/,
-        # not the CLI. Ask in the Zero Discord for the non-CLI entrypoint.
-        raise NotImplementedError("ZERO_MODE=live not wired; use mock")
+        import subprocess
+        out = subprocess.run(["zero", "search", need, "--json"],
+                             capture_output=True, text=True, timeout=60)
+        if out.returncode != 0:
+            return None
+        caps = json.loads(out.stdout).get("capabilities", [])
+        healthy = [c for c in caps if c.get("availabilityStatus") == "healthy"]
+        if not healthy:
+            return None
+        c = healthy[0]
+        return Capability(
+            need=need,
+            service=f"{c['canonicalName']} (via Zero, {c['token']}, "
+                    f"{c['pricing']['summary']})",
+            call=f"zero search {need!r} → {c['method']} {c['url']}",
+            result_path="",
+        )
