@@ -21,4 +21,7 @@ RUN mkdir -p /app/data
 
 EXPOSE 8000
 
-CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# SEED_DEMO=1 boots a fresh deployment with Andrei's trained intern already in
+# place (mock replay of the recorded run, ~1s, zero network) — /i/andrei-dispatch
+# works immediately. Seed failure must not block the API from starting.
+CMD ["sh", "-c", "if [ \"$SEED_DEMO\" = \"1\" ]; then python -m api.seed_demo || true; fi; exec uvicorn api.main:app --host 0.0.0.0 --port 8000"]

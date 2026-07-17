@@ -1,0 +1,59 @@
+# deploy/akash/deploy-app.sdl — the judge-facing demo deployment.
+# Two services: web (public) + api (internal). LLM_PROVIDER=mock — the demo is
+# a replay of a recorded training run; NO API keys leave the laptop. SEED_DEMO=1
+# boots the api with Andrei's trained intern already in place, so
+# <public-url>/i/andrei-dispatch works the moment the lease starts.
+#
+# The per-intern tool-runtime economics pitch stays in deploy.sdl (0.1 CPU).
+version: "2.0"
+
+services:
+  web:
+    image: fluxxion88/intern-web:demo
+    expose:
+      - port: 3000
+        as: 80
+        to:
+          - global: true
+    env:
+      - API_ORIGIN=http://api:8000
+    depends_on:
+      - api
+
+  api:
+    image: fluxxion88/intern-api:demo
+    expose:
+      - port: 8000
+        to:
+          - service: web
+    env:
+      - LLM_PROVIDER=mock
+      - SEED_DEMO=1
+
+profiles:
+  compute:
+    web:
+      resources:
+        cpu: { units: 0.5 }
+        memory: { size: 512Mi }
+        storage: { size: 512Mi }
+    api:
+      resources:
+        cpu: { units: 0.5 }
+        memory: { size: 768Mi }
+        storage: { size: 512Mi }
+  placement:
+    dcloud:
+      pricing:
+        web: { denom: uakt, amount: 1000 }
+        api: { denom: uakt, amount: 1000 }
+
+deployment:
+  web:
+    dcloud:
+      profile: web
+      count: 1
+  api:
+    dcloud:
+      profile: api
+      count: 1

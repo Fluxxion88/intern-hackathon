@@ -4,7 +4,7 @@ Layers (docs/04 §7, cheapest first):
   1  subprocess, never exec/eval in-process
   2  cwd = fresh tempdir; only the input CSVs are copied in
   3  env = {} — nothing inherited, no keys, no AWS_*
-  4  rlimits: CPU 10s, AS 512MB, FSIZE 32MB, NPROC (see note)
+  4  rlimits: CPU 10s, AS 2GB, FSIZE 32MB, NPROC (see note)
   5  20s wall clock, SIGKILL of the process group
   6  AST static check BEFORE running (network/subprocess/eval/exec/
      open-for-write outside the out dir are banned)
@@ -32,7 +32,7 @@ from pathlib import Path
 NPROC_LIMIT = 256 if sys.platform == "darwin" else 0
 
 CPU_SECONDS = 10
-AS_BYTES = 512 * 1024 * 1024
+AS_BYTES = 2 * 1024 * 1024 * 1024  # virtual address space; python+pandas maps >512MB VSZ on Linux (macOS never enforced this)
 FSIZE_BYTES = 32 * 1024 * 1024
 WALL_SECONDS = 20
 
