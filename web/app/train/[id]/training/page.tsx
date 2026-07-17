@@ -379,6 +379,28 @@ function TrainingInner() {
         </Sheet>
       )}
 
+      {/* CTA lives ABOVE the slip stack: slips land below it, so the click
+          target never moves once it appears (UX: don't make him chase it) */}
+      {converged && (
+        <div
+          style={{
+            display: "flex",
+            gap: "var(--s-3)",
+            marginBottom: "var(--s-5)",
+            flexWrap: "wrap",
+          }}
+        >
+          {perfect && (
+            <Button onClick={() => router.push(`/train/${jobId}/ready`)}>
+              It&apos;s ready — go
+            </Button>
+          )}
+          <Button variant="secondary" onClick={() => setShowArtifact(true)}>
+            Show me what it wrote
+          </Button>
+        </div>
+      )}
+
       <div
         style={{ display: "flex", flexDirection: "column", gap: "var(--s-4)" }}
         aria-live="polite"
@@ -416,26 +438,6 @@ function TrainingInner() {
           );
         })}
       </div>
-
-      {converged && (
-        <div
-          style={{
-            display: "flex",
-            gap: "var(--s-3)",
-            marginTop: "var(--s-8)",
-            flexWrap: "wrap",
-          }}
-        >
-          {perfect && (
-            <Button onClick={() => router.push(`/train/${jobId}/ready`)}>
-              It&apos;s ready — go
-            </Button>
-          )}
-          <Button variant="secondary" onClick={() => setShowArtifact(true)}>
-            Show me what it wrote
-          </Button>
-        </div>
-      )}
 
       {dev && state.logs.length > 0 && (
         <div style={{ marginTop: "var(--s-6)" }}>
