@@ -70,6 +70,7 @@ def train(job_dir: str | Path, spec: dict, input_paths: list[str | Path],
     best: AttemptRecord | None = None
     no_gain = 0
     cheat_strikes = 0
+    contradiction_strikes = 0
     outcome: str | None = None
     fail_reason, fail_hint = "", ""
 
@@ -93,11 +94,28 @@ def train(job_dir: str | Path, spec: dict, input_paths: list[str | Path],
                 code, changed, headline = repairer.repair(
                     llm, spec, src.code, src.result.findings)
                 if code is None:
-                    # rule 5: a finding contradicts the spec — human wins
-                    outcome = "FAILED"
-                    fail_reason = "spec_contradiction"
-                    fail_hint = headline
-                    break
+                    # rule 5: the model CLAIMS a finding contradicts the spec.
+                    # The findings derive from the user's own example, so a
+                    # claimed contradiction is usually a misreading — nudge
+                    # once, fail only on a repeat (mirrors anti-cheat strikes).
+                    contradiction_strikes += 1
+                    if contradiction_strikes >= 2:
+                        outcome = "FAILED"
+                        fail_reason = "spec_contradiction"
+                        fail_hint = headline
+                        break
+                    emit(events.log("contradiction claim — re-prompting with nudge"))
+                    code, changed, headline = repairer.repair(
+                        llm, spec, src.code, src.result.findings,
+                        nudge=("The findings are measured from the user's own "
+                               "worked example, which the spec was written to "
+                               "describe — they do not contradict it. Re-read "
+                               "the finding and apply the fix."))
+                    if code is None:
+                        outcome = "FAILED"
+                        fail_reason = "spec_contradiction"
+                        fail_hint = headline
+                        break
         except Exception as exc:
             emit(events.log(f"llm error on attempt {n}: {exc}"))
             outcome = "FAILED"

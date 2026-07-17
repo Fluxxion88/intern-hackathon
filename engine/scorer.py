@@ -347,6 +347,10 @@ def _totals_hint(row: pd.Series, exp: pd.DataFrame, exp_cols: list[str], row_idx
     if empty_cols:
         parts.append(f"These columns are left empty: {', '.join(empty_cols)}.")
     parts.append("Match the target's number formatting in the totals row too.")
+    parts.append("This layout comes from the user's own worked example and is "
+                 "consistent with the spec: the label cell is not a data value, "
+                 "and 'nothing in the other columns' means the columns that are "
+                 "neither the label nor the summed numbers.")
     return " ".join(parts)
 
 
@@ -592,6 +596,11 @@ def crash_result(expected_path: str | Path, traceback_text: str) -> ScoreResult:
     except Exception:
         cells_total = 0
     tail = "\n".join(traceback_text.strip().splitlines()[-15:])
+    # scrub nondeterministic paths (sandbox tempdirs, venv site-packages, hex
+    # addresses) — this hint goes into the repair prompt, and the cassette key
+    # hashes the prompt, so replay breaks if two runs produce different hints
+    tail = re.sub(r'File "[^"]*/(intern-run-[^/"]*/)?([^/"]+)"', r'File "\2"', tail)
+    tail = re.sub(r"0x[0-9a-fA-F]+", "0x…", tail)
     f = Finding("CRASH", None, [], f"the script crashed. Last lines:\n{tail}",
                 float(cells_total or 1))
     return ScoreResult(0.0, 0, cells_total, "0" * cells_total, [f])

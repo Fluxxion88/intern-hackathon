@@ -42,7 +42,10 @@ def generate(llm: LLM, spec: dict, input_paths: list[str | Path]) -> tuple[str, 
     """Returns (code, headline)."""
     user = (
         "THE SPEC (frozen, approved by the user):\n"
-        + json.dumps(spec, indent=2, ensure_ascii=False)
+        + json.dumps({k: v for k, v in spec.items() if k != "slug"},
+                     indent=2, ensure_ascii=False)  # slug is routing metadata, not a
+                                                    # rule — keeping it out makes the
+                                                    # cassette key slug-independent
         + "\n\nTHE INPUT FILES (first rows shown; these are the two files the "
           "script receives as argv[1] and argv[2], in this order):\n\n"
         + "\n\n".join(_preview(p) for p in input_paths)

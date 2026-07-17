@@ -94,10 +94,14 @@ def _findings_block(findings: list[Finding]) -> str:
 
 
 def repair(llm: LLM, spec: dict, code: str, findings: list[Finding],
-           violation: str | None = None) -> tuple[str | None, str, str]:
+           violation: str | None = None,
+           nudge: str | None = None) -> tuple[str | None, str, str]:
     """Returns (code_or_None, changed, headline). code None = spec contradiction."""
     user = (
-        "THE FROZEN SPEC (LAW):\n" + json.dumps(spec, indent=2, ensure_ascii=False)
+        "THE FROZEN SPEC (LAW):\n"
+        + json.dumps({k: v for k, v in spec.items() if k != "slug"},
+                     indent=2, ensure_ascii=False)  # slug excluded: cassette key
+                                                    # must not depend on it
         + "\n\nTHE CURRENT SCRIPT:\n```python\n" + code + "\n```\n"
         + "\nFINDINGS from the deterministic diff (facts, heaviest first):\n"
         + _findings_block(findings)
@@ -109,6 +113,8 @@ def repair(llm: LLM, spec: dict, code: str, findings: list[Finding],
             + "\nYou copied values from the target file into the script. Remove them; "
               "compute every value from the inputs and the spec's rules only."
         )
+    if nudge:
+        user += "\n\nNOTE: " + nudge
     user += "\n\nReturn JSON only."
     raw = llm.complete(SYSTEM, [{"role": "user", "content": user}], max_tokens=8192)
     obj = parse_json_response(raw)
