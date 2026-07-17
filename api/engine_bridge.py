@@ -48,7 +48,11 @@ async def train(job_id: str, publish: Callable[[dict], None]) -> None:
         result = await asyncio.to_thread(
             orchestrator.train,
             job_dir, spec,
-            [f["path"] for f in inputs[:2]],
+            # canonical input order: sorted by filename. Uploads race in the
+            # browser, and argv order is baked into both the prompt (cassette
+            # key) and the trained script — every caller must sort the same way
+            sorted([f["path"] for f in inputs[:2]],
+                   key=lambda p: p.rsplit("/", 1)[-1].casefold()),
             expected[0]["path"],
             engine_llm.get_llm(),
             emit,

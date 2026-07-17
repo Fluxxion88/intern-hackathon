@@ -338,6 +338,8 @@ async def run_intern(slug: str, file: list[UploadFile] = File(...)):
         dest = run_dir / files_mod.safe_filename(up.filename or "input.csv")
         dest.write_bytes(await up.read())
         input_paths.append(str(dest))
+    # canonical input order — must match the training-time rule in engine_bridge
+    input_paths.sort(key=lambda p: p.rsplit("/", 1)[-1].casefold())
     result = engine_stub.run_artifact(job["id"], input_paths, run_dir)
     store.add_run(job["id"], result["ms"], result["ok"])
     if not result["ok"]:

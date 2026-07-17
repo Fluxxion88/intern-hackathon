@@ -52,8 +52,11 @@ def cmd_train(args: argparse.Namespace) -> int:
     fixture = Path(args.fixture)
     if not fixture.is_absolute():
         fixture = REPO_ROOT / fixture
-    inputs = [fixture / "manifest_2026-07-14.csv",
-              fixture / "carrier_rates_2026-07.csv"]
+    # canonical input order: sorted by filename (same rule as the API bridge
+    # and /i/run — argv order is baked into the prompt and the trained script)
+    inputs = sorted([fixture / "manifest_2026-07-14.csv",
+                     fixture / "carrier_rates_2026-07.csv"],
+                    key=lambda p: p.name.casefold())
     expected = fixture / "dispatch_summary_14.07.csv"
     for p in [*inputs, expected]:
         if not p.exists():

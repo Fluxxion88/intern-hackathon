@@ -27,8 +27,9 @@ pytestmark = pytest.mark.skipif(
 
 def test_artifact_generalises_to_unseen_day():
     rr = sandbox_run(ARTIFACT / "tool.py",
-                     [MOCK / "manifest_2026-07-17.csv",
-                      MOCK / "carrier_rates_2026-07b.csv"])
+                     sorted([MOCK / "manifest_2026-07-17.csv",
+                             MOCK / "carrier_rates_2026-07b.csv"],
+                            key=lambda p: p.name.casefold()))
     assert rr.ok, f"artifact crashed on unseen data:\n{rr.stderr}"
     produced = Path(rr.produced_path).read_bytes()
     reference = (MOCK / "_reference_summary_17.07.csv").read_bytes()

@@ -17,6 +17,9 @@ SYSTEM = """\
 Write a standalone Python script implementing the spec below.
 
 Signature:  python tool.py <input_a.csv> <input_b.csv> <output.csv>
+Robustness: the user may pass the two input files IN EITHER ORDER. The script must
+            work out which file is which by reading each file's column headers,
+            never by argv position.
 Allowed:    pandas, and the Python standard library. Nothing else.
 Forbidden:  network of any kind, subprocess, eval/exec, reading any file that isn't
             argv[1] or argv[2], writing any file that isn't argv[3], any AI/model call.
