@@ -1,0 +1,32 @@
+# deploy/akash/deploy.sdl — one trained intern, one deployment (docs/07 §4).
+# The numbers ARE the pitch: 0.1 CPU / 128Mi / 128Mi. No GPU, no model, no state.
+# TODO(sponsor): replace <your-registry> with the pushed intern-tool-runtime image;
+# provider-services CLI not installed locally (no wallet toolchain during the
+# hackathon) — SDL is YAML-validated, deploy is one `provider-services tx
+# deployment create deploy.sdl` away.
+version: "2.0"
+services:
+  tool:
+    image: <your-registry>/intern-tool-runtime:andrei-dispatch
+    expose:
+      - port: 8080
+        as: 80
+        to: [ { global: true } ]
+    env:
+      - TOOL_SLUG=andrei-dispatch
+profiles:
+  compute:
+    tool:
+      resources:
+        cpu: { units: 0.1 }      # <- the number IS the pitch. Show this block.
+        memory: { size: 128Mi }
+        storage: { size: 128Mi }
+  placement:
+    dcloud:
+      pricing:
+        tool: { denom: uakt, amount: 100 }
+deployment:
+  tool:
+    dcloud:
+      profile: tool
+      count: 1

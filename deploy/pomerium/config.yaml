@@ -1,0 +1,60 @@
+# deploy/pomerium/config.yaml — identity-aware proxy in front of everything.
+# Structure per docs/07-SPONSORS.md §3. Local dev uses *.localhost.pomerium.io
+# (public DNS that resolves to 127.0.0.1) and a self-hosted authenticate service.
+#
+# TODO(sponsor): secrets below are static demo values for localhost only —
+# rotate before any non-local deployment.
+# TODO(sponsor): wire a real IdP (the demo uses Pomerium's hosted authenticate,
+# https://authenticate.pomerium.app, which needs no IdP config — the fastest
+# path to a working local login flow). To self-host authenticate instead,
+# uncomment the idp_* block and fill real OAuth client credentials.
+
+address: :443
+
+# Hosted authenticate: zero-config login flow that works locally.
+authenticate_service_url: https://authenticate.pomerium.app
+
+# --- self-hosted alternative (docs/07 §3 verbatim shape) ---
+# authenticate_service_url: https://authenticate.localhost.pomerium.io
+# idp_provider: google
+# idp_client_id: TODO(sponsor)
+# idp_client_secret: TODO(sponsor)
+
+# Static demo secrets (base64, 32 bytes each) — localhost only.
+shared_secret: C92RoJ0uvTA7LuQEs4+W1/rD2nRQvgwX1icg3xcG9O8=
+cookie_secret: hMUEUN8SQZnE+vP2fpdIIWMOR003WBJNIXYH2G8eWl0=
+
+# Self-signed TLS for localhost; browsers will warn, the demo recording is local.
+autocert: false
+self_signed_cert: true
+
+routes:
+  # ① the app
+  - from: https://intern.localhost.pomerium.io
+    to: http://web:3000
+    policy:
+      - allow:
+          or:
+            - email:
+                is: andrei@example.com
+    pass_identity_headers: true          # → X-Pomerium-Jwt-Assertion
+
+  # ② the API — same person, same policy; API reads identity from the
+  #    Pomerium header and never trusts a client-supplied user id.
+  - from: https://intern.localhost.pomerium.io
+    prefix: /api/
+    to: http://api:8000
+    policy:
+      - allow: { or: [ { email: { is: andrei@example.com } } ] }
+    pass_identity_headers: true
+
+  # ★ the interesting one: each trained intern is its own route with its own
+  #   policy. Andrei's drivers get this tool; nobody else gets anything.
+  - from: https://intern.localhost.pomerium.io
+    prefix: /i/andrei-dispatch
+    to: http://api:8000
+    policy:
+      - allow:
+          or:
+            - domain: { is: andrei-freight.com }     # his drivers, nobody else
+    pass_identity_headers: true

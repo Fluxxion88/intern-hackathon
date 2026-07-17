@@ -1,0 +1,24 @@
+# deploy/Dockerfile.tool-runtime — the trained intern's desk (Akash workload).
+# SAME image for every intern; the per-intern artifact mounts at /artifact.
+# Build from repo root:
+#   docker build -f deploy/Dockerfile.tool-runtime -t intern-tool-runtime .
+# Run one intern:
+#   docker run --network=none is NOT possible (the HTTP port must be reachable),
+#   so runtime isolation = empty env for the tool subprocess (see server.py) and
+#   the container exposing nothing but :8080. Per docs/07 §4: 0.1 CPU / 128Mi.
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+RUN pip install --no-cache-dir pandas==2.2.3 fastapi uvicorn python-multipart
+
+WORKDIR /srv
+COPY deploy/tool-runtime/server.py ./server.py
+
+# The per-intern artifact (tool.py + spec.json + guard.json) mounts here.
+VOLUME ["/artifact"]
+
+EXPOSE 8080
+CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8080"]
