@@ -38,8 +38,10 @@ async def train(job_id: str, publish: Callable[[dict], None]) -> None:
 
     def emit(ev: dict) -> None:
         if ev.get("type") == "attempt.scored":
+            n = ev["attempt"]["n"]
+            # the diff endpoint reads the produced CSV from code_path
             store.add_attempt(job_id, ev["attempt"], findings=[],
-                              code_path=str(job_dir / "attempts"))
+                              code_path=str(job_dir / "attempts" / f"attempt_{n}_out.csv"))
         loop.call_soon_threadsafe(publish, ev)
 
     try:
