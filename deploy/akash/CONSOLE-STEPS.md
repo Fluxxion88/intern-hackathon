@@ -39,3 +39,10 @@ Fallbacks (in order): any Docker-capable host —
 + `docker run -d -p 80:3000 fluxxion88/intern-web:demo` on one network with the
 api aliased as `api`. Or demo entirely locally — the recorded video is the
 primary artifact; the public URL is a bonus.
+
+## LIVE DEPLOYMENT (deployed via Console API, 2026-07-17 ~14:45)
+
+- **Public URL: http://c1v988lc4p93nd394caog9pvrg.ingress.cpu.dal.aes.akash.pub**
+- dseq `1784325409922` · provider `provider.cpu.dal.aes.akash.pub` (US-Missouri, 99.5% uptime) · ~$0.03/day
+- Smoke-tested externally: landing 200, /i/andrei-dispatch file-drop → TOTAL 17.11 / 4,368, training replay plays to MATCHED
+- Close when done: `curl -X DELETE https://console-api.akash.network/v1/deployments/1784325409922 -H "x-api-key: $AKASH_API_KEY"`

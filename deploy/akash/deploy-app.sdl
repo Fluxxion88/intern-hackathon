@@ -17,8 +17,6 @@ services:
           - global: true
     env:
       - API_ORIGIN=http://api:8000
-    depends_on:
-      - api
 
   api:
     image: fluxxion88/intern-api:demo
