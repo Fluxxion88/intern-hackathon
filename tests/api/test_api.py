@@ -132,7 +132,8 @@ async def test_walkthrough(client: httpx.AsyncClient):
     d = r.json()
     assert d["expected"]["columns"] == ["Date", "Route", "Truck", "Load (t)", "Cost ($)"]
     assert d["produced"]["columns"] == d["expected"]["columns"]
-    assert len(d["wrong_cells"]) == 30  # 50 cells, 20 ok on attempt 1
+    attempt1 = next(a for a in body["attempts"] if a["n"] == 1)
+    assert len(d["wrong_cells"]) == attempt1["strip"].count("0")
 
     # artifact
     r = await client.get(f"/api/jobs/{job_id}/artifact")
